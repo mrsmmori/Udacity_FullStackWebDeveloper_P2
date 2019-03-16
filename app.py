@@ -61,10 +61,6 @@ def show_items(category):
 @app.route('/catalog/<category>/<item>', methods=['GET'])
 def show_description(category, item):
     id, item = item.split("-")
-
-    print "%%%%%%%%%%%%%%%%%%"
-    print id
-
     item = item.replace("_", " ")
     db = database.get_db()
     with db.cursor() as cur:
@@ -177,16 +173,33 @@ def delete_item_post():
     db.commit()
     return redirect(url_for('base'))
 
-
+from collections import OrderedDict
 
 # json endpoint
 @app.route('/catalog.json')
 def catalog_json():
     db = database.get_db()
+    dict = OrderedDict()
+    dict2 = OrderedDict() 
+    li = []
     with db.cursor() as cur:
-        cur.execute('select * from sports;')
+        cur.execute('select sports.id, sports.name, items.id, items.cat_id, items.title, items.description from sports join items on sports.id = items.cat_id;')
         entries = cur.fetchall()
-    return jsonify({'category': entries})
+        for entry in entries:
+            print entry
+            dict['id'] = entry[0]
+            dict['name'] = entry[1]
+            dict2['id'] = entry[2]
+            dict2['cat_id'] = entry[3]
+            dict2['title'] = entry[4]
+            dict2['description'] = entry[5]
+            dict['Item'] = [dict2]
+            #dict = sorted(dict.items(), key=lambda x: x[0])
+            li.append(dict)
+            dict = OrderedDict()
+            dict2 = OrderedDict() 
+    print li
+    return jsonify({'category': li})
         
 
 if __name__ == "__main__":  
