@@ -1,0 +1,29 @@
+{% extends "layout_base.html" %} 
+
+{% block edit_item %} 
+<div class="my-5, my-x">
+<h1>Edit Item</h1>
+{{id}}
+<form action="/edit_item_post" method="post">
+    <div class="form-group row">
+        <label>Title</label>
+        <input class="form-control" name="title" value="{{item}}">
+        <label>description</label>
+        <input class="form-control" name="description" value="{{description}}">
+        <label>category</label>
+        <select class="custom-select" name="category" value={{category}}>    
+            {% for cate in categories %} 
+                <option value="{{ cate[0] }}">{{ cate[0] }}</option> 
+            {% endfor %} 
+        </select>
+    </div>
+    <input type="hidden" name="id" value={{id}}>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}
+
+<!-- 
+https://qiita.com/hitoribucho/items/9f5dd087b3d784af6b73
+
+
+-->

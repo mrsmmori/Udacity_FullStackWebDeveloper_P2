@@ -1,0 +1,44 @@
+{% extends "layout.html" %} 
+
+{% block categories %} 
+    <table>
+        {% for category in categories %} 
+            <tr>
+                <td>
+                    <a href=/catalog/{{ category[0] }}/items>
+                    {{ category[0] }}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %} 
+    </table>
+{% endblock %}
+
+
+{% block items %} 
+<table class="table table-sm">
+    <thead>     
+        <tr>       
+            <th>#</th>       
+            <th>Category</th>       
+            <th>Item</th>       
+        </tr>   
+    </thead>
+        {% for item in items %} 
+            <tr>
+                <td>{{ item[0] }}</td>
+                <td>{{ item[1] }}</td>
+                <td> 
+                    <a href=/catalog/{{ item[1] }}/{{item[0]}}-{{ item[2].replace(" ", "_") }}>
+                        {{ item[2] }}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %} 
+</table>
+
+{% endblock %}
+
+{% block description %} 
+    {{ description }}
+{% endblock %}

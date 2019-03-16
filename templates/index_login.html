@@ -1,0 +1,62 @@
+{% extends "layout_login.html" %} 
+
+{% block categories %} 
+    <table>
+        {% for category in categories %} 
+            <tr>
+                <td>
+                    <a href=/catalog/{{ category[0] }}/items>
+                    {{ category[0] }}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %} 
+    </table>
+{% endblock %}
+
+
+{% block items %} 
+<table class="table table-sm">
+    <thead>     
+        <tr>       
+            <th>#</th>       
+            <th>Category</th>       
+            <th>Item</th>       
+        </tr>   
+    </thead>
+        {% for item in items %} 
+            <tr>
+                <td>{{ item[0] }}</td>
+                <td>{{ item[1] }}</td>
+                <td> 
+                    <a href=/catalog/{{ item[1] }}/{{item[0]}}-{{ item[2].replace(" ", "_") }}>
+                        {{ item[2] }}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %} 
+
+</table>
+
+{% endblock %}
+
+{% block description %} 
+    {{ description }}
+    {% if description %}
+        {% if item %}
+            <form class="form-inline" action="/catalog/{{item.replace(" ","_")}}/edit" method="post">
+                <input type="hidden" name="id" value={{id}}></input>
+                <input type="hidden" name="category" value={{category}}></input>
+                <input type="hidden" name="item" value="{{item}}"></input>
+                <input type="hidden" name="description" value="{{description}}"></input>
+                <input type="hidden" name="categories" value={{categories}}></input>
+                <input class="btn btn-primary my-1 mx-1" type="submit" value="Edit Item"></input>
+            </form>
+            <form class="form-inline" action="/catalog/{{item.replace(" ", "_")}}/delete" method="post">
+                <input type="hidden" name="id" value={{id}}></input>
+                <input class="btn btn-primary my-1 mx-1" type="submit" value="Delete"></input>
+            </form>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
