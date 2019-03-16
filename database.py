@@ -5,7 +5,6 @@ from flask import current_app, g
 from flask.cli import with_appcontext
 
 
-
 def get_db():
     """Connect to the application's configured database. The connection
     is unique for each request and will be reused if this is called
@@ -50,3 +49,4 @@ def init_app(app):
     """
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
+
