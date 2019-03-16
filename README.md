@@ -16,10 +16,11 @@ The objective of this practice project is to build a web application in vagrant.
 
 - Login vagrant
 ``` 
-vagrant@vagrant:~$ cd /vagrant/catalog
 vagrant@vagrant:/vagrant/catalog
 (2.7.12) $ vagrant up
 (2.7.12) $ vagrant ssh
+vagrant@vagrant:~$ cd /vagrant/catalog
+vagrant@vagrant:/vagrant/catalog
 ```
 
 - build database layout
