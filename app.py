@@ -3,21 +3,19 @@ from flask_sqlalchemy import SQLAlchemy
 import sys
 import psycopg2.extras
 import config
+# remove
 import database
+
 from collections import OrderedDict
 from oauth2client.contrib.flask_util import UserOAuth2
 
+from models import Base, Sports, Items
+
 
 app = Flask(__name__)
-app.secret_key = 'hogehoge'
 app.config.from_object("config.Development")
 app.cli.add_command(database.init_db_command)
 app.secret_key = "secret_key_is_secret"
-
-app.config['GOOGLE_OAUTH2_CLIENT_ID'] = \
-  '266875970319-r0so7u4a0qc2409s7t23v1fg4fa8gur5.apps.googleusercontent.com'
-app.config['GOOGLE_OAUTH2_CLIENT_SECRET'] = \
-  'w2tdxisx2JkwKiOKg3ImFyRI'
 
 oauth2 = UserOAuth2(app)
 
@@ -33,7 +31,7 @@ def example():
     credentials = oauth2.credentials
 
 
-# base
+# root
 @app.route('/', methods=['GET'])
 def base():
     db = database.get_db()
@@ -61,7 +59,7 @@ def show_items(category):
         cur.execute('select name from sports;')
         categories = cur.fetchall()
         cur.execute('''select items.id, sports.name, items.title,
-                    items.description from itemsjoin sports on
+                    items.description from items join sports on
                     items.cat_id = sports.id where sports.name = %s;''',
                     (category,))
         items = cur.fetchall()
@@ -99,7 +97,7 @@ def show_description(category, item):
                                items=items, category=category, item=item,
                                description=description, id=id)
 
-
+# login
 @app.route('/login', methods=['GET', 'POST'])
 @oauth2.required
 def login():
