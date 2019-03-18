@@ -5,7 +5,7 @@ import sys
 import psycopg2.extras
 import config
 # old
-import database
+#import database
 import click
 
 from collections import OrderedDict
@@ -17,19 +17,19 @@ from models import Base, Sports, Items
 app = Flask(__name__)
 app.config.from_object("config.Development")
 app.secret_key = "secret_key_is_secret"
-db = SQLAlchemy(app)
 oauth2 = UserOAuth2(app)
 
 
 def init_db():
+    db = SQLAlchemy(app)
     Base.metadata.drop_all(bind=db.engine)
     Base.metadata.create_all(bind=db.engine)
     sample_sports = ['Soccer', 'Basketball', 'Baseball', 'Frisbee', 'Snowboarding']
     for name in sample_sports:
         sports = Sports()
         sports.name = name
-        db.session.add(sports)
-        db.session.commit()
+        db.session().add(sports)
+        db.session().commit()
 
     sample_items = [
                  ['1', 'The shoes', 'Good condition, Reasonalbe price, good quality'],
@@ -37,15 +37,18 @@ def init_db():
                  ['3', 'The bat', 'condition is so-so, but very expensive'],
                  ['5', 'Snowboard', 'Good condition, good quality'],
                  ['5', 'Snowboard', 'Bad condition, good quality']
+                 
     ] 
     for cat_id, title, description in sample_items:
         items = Items()
         items.cat_id = cat_id
         items.title = title
         items.description = description
-        db.session.add(items)
-        db.session.commit()
-
+        db.session().add(items)
+        db.session().commit()
+    
+    sports = [i[0] for i in db.session.query(Sports.name)]
+    print(sports)
 
 @app.cli.command('initdb')
 def initdb_command():
@@ -53,21 +56,18 @@ def initdb_command():
     click.echo('Initialized the database.')
 
 
+
 # root
 @app.route('/', methods=['GET'])
 def base():
-    categories = [i for i in db.session.query(Sports.name)]
-    items = [i for i in db.session.query(Items.id, Sports.name, Items.title, Items.description).filter(Sports.id == Items.cat_id)]
-
-    #db = database.get_db()
-    #with db.cursor() as cur:
-    #   
-    #    cur.execute('select name from sports;')
-    #    categories = cur.fetchall()
-    #    cur.execute('''select items.id, sports.name, items.title,
-    #                    items.description from items join sports on
-    #                    items.cat_id = sports.id order by items.id asc;''')
-    #    items = cur.fetchall()
+    db = database.get_db()
+    with db.cursor() as cur:
+        cur.execute('select name from sports;')
+        categories = cur.fetchall()
+        cur.execute('''select items.id, sports.name, items.title,
+                        items.description from items join sports on
+                        items.cat_id = sports.id order by items.id asc;''')
+        items = cur.fetchall()
 
     if not oauth2.has_credentials():
         return render_template('index.html', categories=categories,
@@ -80,19 +80,15 @@ def base():
 # show items
 @app.route('/catalog/<category>/items', methods=['GET'])
 def show_items(category):
-    categories = [i for i in db.session.query(Sports.name)]
-    items = [i for i in db.session.query(Items.id, Sports.name, Items.title, Items.description).filter(Sports.id == Items.cat_id)]
-
-    #db = database.get_db()
-    #with db.cursor() as cur:
-    #    cur.execute('select name from sports;')
-    #    categories = cur.fetchall()
-    #    cur.execute('''select items.id, sports.name, items.title,
-    #                items.description from items join sports on
-    #                items.cat_id = sports.id where sports.name = %s;''',
-    #                (category,))
-    #    items = cur.fetchall()
-
+    db = database.get_db()
+    with db.cursor() as cur:
+        cur.execute('select name from sports;')
+        categories = cur.fetchall()
+        cur.execute('''select items.id, sports.name, items.title,
+                    items.description from items join sports on
+                    items.cat_id = sports.id where sports.name = %s;''',
+                    (category,))
+        items = cur.fetchall()
     if not oauth2.has_credentials():
         return render_template('index.html', categories=categories,
                                items=items)

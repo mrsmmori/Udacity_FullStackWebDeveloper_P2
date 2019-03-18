@@ -1,5 +1,6 @@
 class Production(object):
     SQLALCHEMY_DATABASE_URI = "postgresql:///sports"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = False
     TESTING = False
     JSON_SORT_KEYS = False
@@ -8,6 +9,7 @@ class Production(object):
 
 class Development(object):
     SQLALCHEMY_DATABASE_URI = "postgresql:///sports"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = True 
     TESTING = False
     JSON_SORT_KEYS = False
