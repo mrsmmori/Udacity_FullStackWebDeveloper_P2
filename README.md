@@ -26,6 +26,11 @@ vagrant@vagrant:~$ cd /vagrant/catalog
 vagrant@vagrant:/vagrant/catalog
 ```
 
+- create database sports
+```
+postgres=# create database sports;
+```
+
 - build database layout and input sample data
 ``` python
 vagrant@vagrant:/vagrant/catalog$ flask initdb
