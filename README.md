@@ -20,7 +20,6 @@ The objective of this practice project is to build a mock web application in vag
 
 - Login vagrant
 ``` bash 
-vagrant@vagrant:/vagrant/catalog
 (2.7.12) $ vagrant up
 (2.7.12) $ vagrant ssh
 vagrant@vagrant:~$ cd /vagrant/catalog
