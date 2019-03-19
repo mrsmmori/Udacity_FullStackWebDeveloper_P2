@@ -22,6 +22,7 @@ oauth2 = UserOAuth2(app)
 
 
 def init_db():
+    # Setup database layout
     Base.metadata.drop_all(bind=db.engine)
     Base.metadata.create_all(bind=db.engine)
     sample_sports = ['Soccer', 'Basketball', 'Baseball', 'Frisbee', 'Snowboarding']
@@ -31,6 +32,7 @@ def init_db():
         db.session.add(sports)
         db.session.commit()
 
+    # Input sample data
     sample_items = [
                  ['1', 'The shoes', 'Good condition, Reasonalbe price, good quality'],
                  ['1', 'The shirt', 'Not good condition, Price is okay, not good condition'],
@@ -57,7 +59,9 @@ def initdb_command():
 @app.route('/', methods=['GET'])
 def base():
     categories = [i for i in db.session.query(Sports.name)]
-    items = [i for i in db.session.query(Items.id, Sports.name, Items.title, Items.description).filter(Sports.id == Items.cat_id)]
+    items = [i for i in db.session.query(Items.id, Sports.name, Items.title, 
+        Items.description).filter(Sports.id == Items.cat_id).order_by(Items.id)]
+    items = [(str(i[0]), i[1], i[2], i[3]) for i in items]
 
     #db = database.get_db()
     #with db.cursor() as cur:
@@ -81,7 +85,9 @@ def base():
 @app.route('/catalog/<category>/items', methods=['GET'])
 def show_items(category):
     categories = [i for i in db.session.query(Sports.name)]
-    items = [i for i in db.session.query(Items.id, Sports.name, Items.title, Items.description).filter(Sports.id == Items.cat_id)]
+    items = [i for i in db.session.query(Items.id, Sports.name, Items.title, 
+        Items.description).filter(Sports.id == Items.cat_id).filter(Sports.name == category).order_by(Items.id)]
+    items = [(str(i[0]), i[1], i[2], i[3]) for i in items]
 
     #db = database.get_db()
     #with db.cursor() as cur:
@@ -106,18 +112,25 @@ def show_items(category):
 def show_description(category, item):
     id, item = item.split("-")
     item = item.replace("_", " ")
-    db = database.get_db()
-    with db.cursor() as cur:
-        cur.execute('select name from sports;')
-        categories = cur.fetchall()
-        cur.execute('''select items.id, sports.name, items.title,
-        items.description from items join sports on
-        items.cat_id = sports.id where sports.name = %s;''', (category,))
-        items = cur.fetchall()
-        cur.execute('''select items.description, items.id from items
-        join sports on items.cat_id = sports.id
-        where items.id =%s;''', (id,))
-        description = cur.fetchone()[0]
+
+    categories = [i for i in db.session.query(Sports.name)]
+    #db = database.get_db()
+    #with db.cursor() as cur:
+    #categories = [i for i in db.session.query(Sports.name)]
+        #cur.execute('select name from sports;')
+        #categories = cur.fetchall()
+
+    items = db.session.query(Items.id, Sports.name, 
+    Items.title, Items.description).filter(Sports.id == Items.cat_id).filter(Sports.name == category)
+        #cur.execute('''select items.id, sports.name, items.title,
+        #items.description from items join sports on
+        #items.cat_id = sports.id where sports.name = %s;''', (category,))
+        #items = cur.fetchall()
+    description = db.session.query(Items.description).filter(Sports.id == Items.cat_id).filter(Items.id == id).first()[0] 
+        #cur.execute('''select items.description, items.id from items
+        #join sports on items.cat_id = sports.id
+        #where items.id =%s;''', (id,))
+        #description = cur.fetchone()[0]
 
     if not oauth2.has_credentials():
         return render_template('index.html', categories=categories,
@@ -146,10 +159,11 @@ def logout():
 @app.route('/add_item', methods=['GET'])
 @oauth2.required
 def add_item():
-    db = database.get_db()
-    with db.cursor() as cur:
-        cur.execute('select name from sports;')
-        categories = cur.fetchall()
+    categories = [i for i in db.session.query(Sports.name)]
+    #db = database.get_db()
+    #with db.cursor() as cur:
+    #    cur.execute('select name from sports;')
+    #    categories = cur.fetchall()
     return render_template('add_item.html', categories=categories)
 
 
@@ -161,15 +175,24 @@ def add_item_post():
     title = request.form['title']
     description = request.form['description']
 
-    db = database.get_db()
-    with db.cursor() as cur:
-        cur.execute('select id from sports where name = %s;', (name,))
-        cat_id = cur.fetchone()
-    cat_id = cat_id[0]
-    with db.cursor() as cur:
-        cur.execute('''insert into items (cat_id, title, description)
-                    values (%s, %s, %s);''', (cat_id, title, description))
-    db.commit()
+    cat_id = db.session.query(Sports.id).filter(Sports.name == name).first()
+    #db = database.get_db()
+    #with db.cursor() as cur:
+    #    cur.execute('select id from sports where name = %s;', (name,))
+    #    cat_id = cur.fetchone()
+    #cat_id = cat_id[0]
+    
+    items = Items()
+    items.cat_id = cat_id
+    items.title = title
+    items.description = description
+    db.session.add(items)
+    db.session.commit()
+    
+    #with db.cursor() as cur:
+    #    cur.execute('''insert into items (cat_id, title, description)
+    #                values (%s, %s, %s);''', (cat_id, title, description))
+    #db.commit()
     return redirect(url_for('base'))
 
 
@@ -182,10 +205,13 @@ def edit_item(item):
     item = request.form['item']
     description = request.form['description']
     id = request.form['id']
-    db = database.get_db()
-    with db.cursor() as cur:
-        cur.execute('select name from sports;')
-        categories = cur.fetchall()
+    
+    categories = [i for i in db.session.query(Sports.name)]
+    #db = database.get_db()
+    #with db.cursor() as cur:
+    #    cur.execute('select name from sports;')
+    #    categories = cur.fetchall()
+    
     return render_template('edit_item.html', item=item,
                            description=description, category=category,
                            categories=categories, id=id)
@@ -199,18 +225,29 @@ def edit_item_post():
     name = request.form['category']
     title = request.form['title']
     description = request.form['description']
+    cat_id = db.session.query(Sports.id).filter(Sports.name == name).first()[0]
 
-    db = database.get_db()
-    with db.cursor() as cur:
-        cur.execute('select id from sports where name = %s;', (name,))
-        cat_id = cur.fetchone()
-    cat_id = cat_id[0]
+    print "####"
+    print id, name, title, description, cat_id
+    print "####"
+    #db = database.get_db()
+    #with db.cursor() as cur:
+    #    cur.execute('select id from sports where name = %s;', (name,))
+    #    cat_id = cur.fetchone()
+    #cat_id = cat_id[0]
 
-    with db.cursor() as cur:
-        cur.execute('''update items set cat_id=%s, title=%s,
-                        description=%s where id=%s;''',
-                    (cat_id, title, description, id))
-    db.commit()
+    #id = db.session.query(Items.cat_id, Items.title, Items.description).filter(Items.id == id).first()
+    id = db.session.query(Items).filter(Items.id == id).first()
+    id.cat_id = cat_id
+    id.title = title
+    id.description = description
+    db.session.commit()
+    
+    #with db.cursor() as cur:
+    #    cur.execute('''update items set cat_id=%s, title=%s,
+    #                    description=%s where id=%s;''',
+    #                (cat_id, title, description, id))
+    #db.commit()
     return redirect(url_for('base'))
 
 
@@ -227,37 +264,46 @@ def delete_item(item):
 @oauth2.required
 def delete_item_post():
     id = request.form['id']
-    db = database.get_db()
-    with db.cursor() as cur:
-        cur.execute('delete from items where id = %s', (id, ))
-    db.commit()
+    
+    db.session.query(Items).filter(Items.id == id).delete()
+    db.session.commit()
+    #db = database.get_db()
+    #with db.cursor() as cur:
+    #    cur.execute('delete from items where id = %s', (id, ))
+    #db.commit()
     return redirect(url_for('base'))
 
 
 # json endpoint
 @app.route('/catalog.json')
 def catalog_json():
-    db = database.get_db()
+    
     dict = OrderedDict()
     dict2 = OrderedDict()
     li = []
-    with db.cursor() as cur:
-        cur.execute('''select sports.id, sports.name, items.id, items.cat_id,
-                        items.title, items.description from sports join items
-                        on sports.id = items.cat_id;''')
-        entries = cur.fetchall()
-        for entry in entries:
-            print entry
-            dict['id'] = entry[0]
-            dict['name'] = entry[1]
-            dict2['id'] = entry[2]
-            dict2['cat_id'] = entry[3]
-            dict2['title'] = entry[4]
-            dict2['description'] = entry[5]
-            dict['Item'] = [dict2]
-            li.append(dict)
-            dict = OrderedDict()
-            dict2 = OrderedDict()
+    
+    entries = [i for i in db.session.query(Sports.id, Sports.name, Items.id, Items.cat_id, 
+    Items.title, Items.description).filter(Sports.id == Items.cat_id)]
+    print entries
+
+    #db = database.get_db()
+    #with db.cursor() as cur:
+    #    cur.execute('''select sports.id, sports.name, items.id, items.cat_id,
+    #                    items.title, items.description from sports join items
+    #                    on sports.id = items.cat_id;''')
+    #    entries = cur.fetchall()
+    for entry in entries:
+        print entry
+        dict['id'] = entry[0]
+        dict['name'] = entry[1]
+        dict2['id'] = entry[2]
+        dict2['cat_id'] = entry[3]
+        dict2['title'] = entry[4]
+        dict2['description'] = entry[5]
+        dict['Item'] = [dict2]
+        li.append(dict)
+        dict = OrderedDict()
+        dict2 = OrderedDict()
     return jsonify({'category': li})
 
 
