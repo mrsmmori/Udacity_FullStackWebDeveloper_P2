@@ -1,16 +1,20 @@
-Udacity_FullStackWebDeveloper_P2
+Udacity_FullStackWebDeveloper_P2 / Item Catalog App
 ====
 
 # Overview
 This program was built for Udacity Full Stack Web Developer / Project 2.
-The objective of this practice project is to build a web application in vagrant.
+The objective of this practice project is to build a mock web application in vagrant. Below are project descriptions:
 
 <a href="https://docs.google.com/document/d/e/2PACX-1vT7XPf0O3oLCACjKEaRVc_Z-nNoG6_ssRoo_Mai5Ce6qFK_v7PpR1lxmudIOqzKo2asKOc89WC-qpfG/pub?embedded=true">Item Catalog: Getting Started</a>
 
-# Description
+
+<a href="https://review.udacity.com/#!/rubrics/2008/view">Item Catalog: Rubrics</a>
+
+# Codes
 - **app.py** to run catalog app
-- **database.py** to build database layout
-- **schema.sql** to define database layout and input some entries
+- **models.py** to define database layout
+- **config.py** to define app configuration
+- **settings.py** to define flask settings
 
 # Usage
 
@@ -23,7 +27,7 @@ vagrant@vagrant:~$ cd /vagrant/catalog
 vagrant@vagrant:/vagrant/catalog
 ```
 
-- build database layout
+- build database layout and input sample data
 ``` python
 vagrant@vagrant:/vagrant/catalog$ flask initdb
 Initialized the database.
@@ -33,6 +37,13 @@ Initialized the database.
 ``` python
 vagrant@vagrant:/vagrant/catalog$ python app.py
 ```
+
+- Open <a href="localhost:8000">localhost:8000</a> in browser.
+
+
+# Authentication
+Page implements Google authentication & authorization service.
+
 
 # Author
 
