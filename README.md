@@ -25,7 +25,7 @@ vagrant@vagrant:/vagrant/catalog
 
 - build database layout
 ``` python
-vagrant@vagrant:/vagrant/catalog$ flask init-db
+vagrant@vagrant:/vagrant/catalog$ flask initdb
 Initialized the database.
 ```
 
