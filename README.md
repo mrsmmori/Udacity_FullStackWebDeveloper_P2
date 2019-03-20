@@ -18,28 +18,21 @@ The objective of this practice project is to build a mock web application in vag
 
 # Usage
 
-- Login vagrant
+- How to run this APP.
 ``` bash 
 (2.7.12) $ vagrant up
 (2.7.12) $ vagrant ssh
 vagrant@vagrant:~$ cd /vagrant/catalog
-vagrant@vagrant:/vagrant/catalog
-```
+vagrant@vagrant:/vagrant/catalog$ psql
+psql (9.5.14)
+Type "help" for help.
 
-- create database sports
-```
-postgres=# create database sports;
-```
+vagrant=> create database sports;
 
-- build database layout and input sample data
-``` python
 vagrant@vagrant:/vagrant/catalog$ flask initdb
 Initialized the database.
-```
-
-- run app.py
-``` python
 vagrant@vagrant:/vagrant/catalog$ python app.py
+
 ```
 
 - Open <a href="localhost:8000">localhost:8000</a> in browser.
