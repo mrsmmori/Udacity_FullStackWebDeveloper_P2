@@ -28,7 +28,7 @@ psql (9.5.14)
 Type "help" for help.
 
 postgres=> create database sports;
-postgres=> commit
+postgres=> commit;
 
 
 vagrant@vagrant:/vagrant/catalog$ flask initdb
