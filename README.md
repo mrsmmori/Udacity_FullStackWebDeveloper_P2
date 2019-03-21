@@ -23,11 +23,13 @@ The objective of this practice project is to build a mock web application in vag
 (2.7.12) $ vagrant up
 (2.7.12) $ vagrant ssh
 vagrant@vagrant:~$ cd /vagrant/catalog
-vagrant@vagrant:/vagrant/catalog$ psql
+vagrant@vagrant:/vagrant/catalog$ psql postgres
 psql (9.5.14)
 Type "help" for help.
 
 vagrant=> create database sports;
+postgres=> commit
+
 
 vagrant@vagrant:/vagrant/catalog$ flask initdb
 Initialized the database.
