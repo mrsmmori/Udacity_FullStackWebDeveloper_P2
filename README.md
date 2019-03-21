@@ -27,7 +27,7 @@ vagrant@vagrant:/vagrant/catalog$ psql postgres
 psql (9.5.14)
 Type "help" for help.
 
-vagrant=> create database sports;
+postgres=> create database sports;
 postgres=> commit
 
 
