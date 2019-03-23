@@ -215,7 +215,6 @@ def catalog_json():
                Items.cat_id, Items.title, Items.description)
                .filter(Sports.id == Items.cat_id)]
     for entry in entries:
-        print entry
         dict['id'] = entry[0]
         dict['name'] = entry[1]
         dict2['id'] = entry[2]
