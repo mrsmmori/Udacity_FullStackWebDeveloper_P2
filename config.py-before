@@ -9,8 +9,10 @@ class Production(object):
     TESTING = False
     JSON_SORT_KEYS = False
     GOOGLE_OAUTH2_CLIENT_ID = \
-        '266875970319-72flnfnkmg9pg8njvb33dv58033g215h.apps.googleusercontent.com'
-    GOOGLE_OAUTH2_CLIENT_SECRET = 'xSrQWexg8QgqY7c8WmBF2LhZ'
+        '266875970319-r0so7u4a0qc2409s7t23v1fg4fa8gur5.apps.' +\
+        'googleusercontent.com'
+    GOOGLE_OAUTH2_CLIENT_SECRET = \
+        'w2tdxisx2JkwKiOKg3ImFyRI'
 
 
 class Development(object):
@@ -20,5 +22,6 @@ class Development(object):
     TESTING = False
     JSON_SORT_KEYS = False
     GOOGLE_OAUTH2_CLIENT_ID = \
-        '266875970319-72flnfnkmg9pg8njvb33dv58033g215h.apps.googleusercontent.com'
-    GOOGLE_OAUTH2_CLIENT_SECRET = 'xSrQWexg8QgqY7c8WmBF2LhZ'
+        '266875970319-r0so7u4a0qc2409s7t23v1fg4fa8gur5.apps.' +\
+        'googleusercontent.com'
+    GOOGLE_OAUTH2_CLIENT_SECRET = 'w2tdxisx2JkwKiOKg3ImFyRI'
