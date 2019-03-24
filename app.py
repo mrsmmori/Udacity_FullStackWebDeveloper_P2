@@ -31,11 +31,11 @@ def _request_user_info(credentials):
     if resp.status != 200:
         current_app.logger.error(
             "Error while obtaining user profile: \n%s: %s", resp, content)
-    	return None
+        return None
     session['profile'] = json.loads(content.decode('utf-8'))
 
-
 oauth2 = UserOAuth2(app)
+
 
 def init_db():
     # Setup database layout
@@ -77,7 +77,6 @@ def initdb_command():
     click.echo('Initialized the database.')
 
 
-#root
 @app.route('/', methods=['GET'])
 def base():
     categories = [i for i in db.session.query(Sports.name)]
@@ -93,7 +92,6 @@ def base():
                                items=items)
 
 
-#show items
 @app.route('/catalog/<category>/items', methods=['GET'])
 def show_items(category):
     categories = [i for i in db.session.query(Sports.name)]
@@ -109,7 +107,6 @@ def show_items(category):
                                items=items)
 
 
-#show description
 @app.route('/catalog/<category>/<item>', methods=['GET'])
 def show_description(category, item):
     id, item = item.split("-")
@@ -136,14 +133,12 @@ def show_description(category, item):
                                description=description, id=id)
 
 
-#login
 @app.route('/login', methods=['GET', 'POST'])
 @oauth2.required
 def login():
     return redirect(url_for('base'))
 
 
-#logout
 @app.route("/logout", methods=['POST'])
 @oauth2.required
 def logout():
@@ -151,7 +146,6 @@ def logout():
     return redirect(url_for('base'))
 
 
-#add_item
 @app.route('/add_item', methods=['GET'])
 @oauth2.required
 def add_item():
@@ -159,7 +153,6 @@ def add_item():
     return render_template('add_item.html', categories=categories)
 
 
-#add_item_post
 @app.route('/add_item_post', methods=['POST'])
 @oauth2.required
 def add_item_post():
@@ -176,7 +169,6 @@ def add_item_post():
     return redirect(url_for('base'))
 
 
-#edit_item
 @app.route('/catalog/<item>/edit', methods=['POST'])
 @oauth2.required
 def edit_item(item):
@@ -191,7 +183,6 @@ def edit_item(item):
                            categories=categories, id=id)
 
 
-#edit_item_post
 @app.route('/edit_item_post', methods=['POST'])
 @oauth2.required
 def edit_item_post():
@@ -208,7 +199,6 @@ def edit_item_post():
     return redirect(url_for('base'))
 
 
-#delete_item
 @app.route('/catalog/<item>/delete', methods=['POST'])
 @oauth2.required
 def delete_item(item):
@@ -216,7 +206,6 @@ def delete_item(item):
     return render_template('delete_item.html', id=id)
 
 
-#delete_item_post
 @app.route('/delete_item_post', methods=['POST'])
 @oauth2.required
 def delete_item_post():
@@ -226,7 +215,6 @@ def delete_item_post():
     return redirect(url_for('base'))
 
 
-#json endpoint
 @app.route('/catalog.json')
 def catalog_json():
     dict = OrderedDict()

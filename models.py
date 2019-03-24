@@ -12,15 +12,13 @@ class Sports(Base):
     __tablename__ = 'sports'
     id = Column('id', Integer, autoincrement=True, primary_key=True)
     name = Column('name', String(20, convert_unicode=True))
-    #cat_id = Column(Integer, ForeignKey('sports.id'))
     items = relationship("Items")
 
 
 class Items(Base):
     __tablename__ = 'items'
     id = Column('id', Integer, autoincrement=True, primary_key=True)
-    #cat_id = Column('cat_id', Integer, primary_key=False)
-    cat_id = Column(Integer, ForeignKey('sports.id', onupdate='CASCADE', ondelete='CASCADE'))
+    cat_id = Column(Integer, ForeignKey('sports.id', onupdate='CASCADE',
+                    ondelete='CASCADE'))
     title = Column('title', String(20, convert_unicode=True))
     description = Column('description', String(3000, convert_unicode=True))
-    
