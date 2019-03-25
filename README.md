@@ -31,6 +31,7 @@ postgres=> create database sports;
 postgres=> commit;
 
 
+vagrant@vagrant:/vagrant/catalog$ export FLASK_APP=/vagrant/catalog/app.py
 vagrant@vagrant:/vagrant/catalog$ flask initdb
 Initialized the database.
 vagrant@vagrant:/vagrant/catalog$ python app.py
