@@ -21,6 +21,10 @@
                     <a class="nav-link active my-1 mx-1" href="/add_item">Add Item</a>
                 </li>
             </ul>
+            <span class="text-white">
+                {% block user %}
+                {% endblock %}
+            </span>
             <form class="form-inline" action="/login" method="post">
                 <button class="btn btn-light disabled my-1 mx-1" type="submit">Login</button>
             </form>

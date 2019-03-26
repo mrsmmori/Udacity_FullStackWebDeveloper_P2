@@ -22,3 +22,4 @@ class Items(Base):
                     ondelete='CASCADE'))
     title = Column('title', String(20, convert_unicode=True))
     description = Column('description', String(3000, convert_unicode=True))
+    created_by = Column('created_by', String(20, convert_unicode=True))

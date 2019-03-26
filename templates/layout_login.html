@@ -21,6 +21,10 @@
                     <a class="nav-link active my-1 mx-1" href="/add_item">Add Item</a>
                 </li>
             </ul>
+			<span class="text-white">
+                {% block user %}
+                {% endblock %}
+			</span>
             <form class="form-inline" action="" method="">
                 <button class="btn btn-light disabled my-1 mx-1" type="submit">Login</button>
             </form>
@@ -40,7 +44,7 @@
                         </div>
                     </span>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-5">
                     <span class="d-block my-3 mx-3">
                         <div class="my-3 mx-3">
                             <h5>Items</h5>
@@ -50,7 +54,7 @@
                         </div>
                     </span>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <span class="d-block my-3 mx-3">
                         <div class="my-3 mx-3">
                             <h5>Description</h5>

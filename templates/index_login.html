@@ -1,5 +1,7 @@
 {% extends "layout_login.html" %} 
-
+{% block user %} 
+	{{ user }}
+{% endblock %}
 {% block categories %} 
     <table>
         {% for category in categories %} 
@@ -22,6 +24,7 @@
             <th>#</th>       
             <th>Category</th>       
             <th>Item</th>       
+            <th>Created By</th>       
         </tr>   
     </thead>
         {% for item in items %} 
@@ -33,6 +36,7 @@
                         {{ item[2] }}
                     </a>
                 </td>
+                <td>{{ item[4] }}</td>
             </tr>
         {% endfor %} 
 
@@ -43,20 +47,20 @@
 {% block description %} 
     {{ description }}
     {% if description %}
-        {% if item %}
-            <form class="form-inline" action="/catalog/{{item.replace(" ","_")}}/edit" method="post">
-                <input type="hidden" name="id" value={{id}}></input>
-                <input type="hidden" name="category" value={{category}}></input>
-                <input type="hidden" name="item" value="{{item}}"></input>
-                <input type="hidden" name="description" value="{{description}}"></input>
-                <input type="hidden" name="categories" value={{categories}}></input>
-                <input class="btn btn-primary my-1 mx-1" type="submit" value="Edit Item"></input>
-            </form>
-            <form class="form-inline" action="/catalog/{{item.replace(" ", "_")}}/delete" method="post">
-                <input type="hidden" name="id" value={{id}}></input>
-                <input class="btn btn-primary my-1 mx-1" type="submit" value="Delete"></input>
-            </form>
-        {% endif %}
+    	{% if created_by %}
+    	<form class="form-inline" action="/catalog/{{item.replace(" ","_")}}/edit" method="post">
+            <input type="hidden" name="id" value={{id}}></input>
+            <input type="hidden" name="category" value={{category}}></input>
+            <input type="hidden" name="item" value="{{item}}"></input>
+            <input type="hidden" name="description" value="{{description}}"></input>
+            <input type="hidden" name="categories" value={{categories}}></input>
+            <input class="btn btn-primary my-1 mx-1" type="submit" value="Edit Item"></input>
+    	</form>
+     	<form class="form-inline" action="/catalog/{{item.replace(" ", "_")}}/delete" method="post">
+           	<input type="hidden" name="id" value={{id}}></input>
+           	<input class="btn btn-primary my-1 mx-1" type="submit" value="Delete"></input>
+       	</form>
+    	{% endif %}
     {% endif %}
 {% endblock %}
 

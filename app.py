@@ -15,25 +15,6 @@ app = Flask(__name__)
 app.config.from_object("config.Development")
 app.secret_key = "secret_key_is_secret"
 db = SQLAlchemy(app)
-
-
-def _request_user_info(credentials):
-    """
-    Makes an HTTP request to the Google+ API to retrieve the user's basic
-    profile information, including full name and photo, and stores it in the
-    Flask session.
-    """
-    http = httplib2.Http()
-    credentials.authorize(http)
-    resp, content = http.request(
-        'https://www.googleapis.com/plus/v1/people/me')
-
-    if resp.status != 200:
-        current_app.logger.error(
-            "Error while obtaining user profile: \n%s: %s", resp, content)
-        return None
-    session['profile'] = json.loads(content.decode('utf-8'))
-
 oauth2 = UserOAuth2(app)
 
 
@@ -56,17 +37,18 @@ def init_db():
 
     # Input sample data
     sample_items = [
-        ['1', 'The shoes', 'Good condition, Reasonalbe price, good quality'],
-        ['1', 'The shirt', 'Not good condition, Price is okay'],
-        ['3', 'The bat', 'condition is so-so, but very expensive'],
-        ['5', 'Snowboard', 'Good condition, good quality'],
-        ['5', 'Snowboard', 'Bad condition, good quality']
+        ['1', 'The shoes', 'Good condition, Reasonalbe price, good quality', 'test@gmail.com'],
+        ['1', 'The shirt', 'Not good condition, Price is okay', 'test@gmail.com'],
+        ['3', 'The bat', 'condition is so-so, but very expensive', 'test@gmail.com'],
+        ['5', 'Snowboard', 'Good condition, good quality', 'test@gmail.com'],
+        ['5', 'Snowboard', 'Bad condition, good quality', 'test@gmail.com']
     ]
-    for cat_id, title, description in sample_items:
+    for cat_id, title, description, created_by in sample_items:
         items = Items()
         items.cat_id = cat_id
         items.title = title
         items.description = description
+        items.created_by = created_by
         db.session.add(items)
         db.session.commit()
 
@@ -81,30 +63,30 @@ def initdb_command():
 def base():
     categories = [i for i in db.session.query(Sports.name)]
     items = [i for i in db.session.query(Items.id, Sports.name, Items.title,
-             Items.description).filter(Sports.id == Items.cat_id)
+             Items.description, Items.created_by).filter(Sports.id == Items.cat_id)
              .order_by(Items.id)]
-    items = [(str(i[0]), i[1], i[2], i[3]) for i in items]
+    items = [(str(i[0]), i[1], i[2], i[3], i[4]) for i in items]
     if not oauth2.has_credentials():
         return render_template('index.html', categories=categories,
                                items=items)
     else:
         return render_template('index_login.html', categories=categories,
-                               items=items)
+                               items=items, user=oauth2.email)
 
 
 @app.route('/catalog/<category>/items', methods=['GET'])
 def show_items(category):
     categories = [i for i in db.session.query(Sports.name)]
     items = [i for i in db.session.query(Items.id, Sports.name, Items.title,
-             Items.description).filter(Sports.id == Items.cat_id)
+             Items.description, Items.created_by).filter(Sports.id == Items.cat_id)
              .filter(Sports.name == category).order_by(Items.id)]
-    items = [(str(i[0]), i[1], i[2], i[3]) for i in items]
+    items = [(str(i[0]), i[1], i[2], i[3], i[4]) for i in items]
     if not oauth2.has_credentials():
         return render_template('index.html', categories=categories,
                                items=items)
     else:
         return render_template('index_login.html', categories=categories,
-                               items=items)
+                               items=items, user=oauth2.email)
 
 
 @app.route('/catalog/<category>/<item>', methods=['GET'])
@@ -115,22 +97,38 @@ def show_description(category, item):
     categories = [i for i in db.session.query(Sports.name)]
 
     items = db.session.query(
-        Items.id, Sports.name,
+        Items.id,
+        Sports.name,
         Items.title,
-        Items.description)\
+        Items.description,
+        Items.created_by)\
         .filter(Sports.id == Items.cat_id)\
         .filter(Sports.name == category)
+
     description = db.session.query(Items.description)\
+        .filter(Sports.id == Items.cat_id).filter(Items.id == id).first()[0]
+
+    created_by = db.session.query(Items.created_by)\
         .filter(Sports.id == Items.cat_id).filter(Items.id == id).first()[0]
 
     if not oauth2.has_credentials():
         return render_template('index.html', categories=categories,
                                items=items, description=description)
     else:
-        return render_template('index_login.html',
+        if created_by == oauth2.email:
+            return render_template('index_login.html',
                                categories=categories,
                                items=items, category=category, item=item,
-                               description=description, id=id)
+                               description=description, 
+                               created_by=oauth2.email,
+                               id=id, user=oauth2.email)
+        else:
+           return render_template('index_login.html',
+                               categories=categories,
+                               items=items, category=category, item=item,
+                               description=description, 
+                               created_by="",
+                               id=id, user=oauth2.email)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -139,7 +137,7 @@ def login():
     return redirect(url_for('base'))
 
 
-@app.route("/logout", methods=['POST'])
+@app.route("/logout", methods=['GET', 'POST'])
 @oauth2.required
 def logout():
     session.clear()
@@ -150,7 +148,7 @@ def logout():
 @oauth2.required
 def add_item():
     categories = [i for i in db.session.query(Sports.name)]
-    return render_template('add_item.html', categories=categories)
+    return render_template('add_item.html', categories=categories, user=oauth2.email)
 
 
 @app.route('/add_item_post', methods=['POST'])
@@ -164,6 +162,7 @@ def add_item_post():
     items.cat_id = cat_id
     items.title = title
     items.description = description
+    items.created_by = oauth2.email
     db.session.add(items)
     db.session.commit()
     return redirect(url_for('base'))
@@ -180,7 +179,7 @@ def edit_item(item):
     categories = [i for i in db.session.query(Sports.name)]
     return render_template('edit_item.html', item=item,
                            description=description, category=category,
-                           categories=categories, id=id)
+                           categories=categories, id=id, user=oauth2.email)
 
 
 @app.route('/edit_item_post', methods=['POST'])
@@ -203,7 +202,7 @@ def edit_item_post():
 @oauth2.required
 def delete_item(item):
     id = request.form['id']
-    return render_template('delete_item.html', id=id)
+    return render_template('delete_item.html', id=id, user=oauth2.email)
 
 
 @app.route('/delete_item_post', methods=['POST'])

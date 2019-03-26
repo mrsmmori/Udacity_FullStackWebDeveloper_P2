@@ -22,6 +22,7 @@
             <th>#</th>       
             <th>Category</th>       
             <th>Item</th>       
+            <th>Created By</th>       
         </tr>   
     </thead>
         {% for item in items %} 
@@ -33,6 +34,7 @@
                         {{ item[2] }}
                     </a>
                 </td>
+                <td>{{ item[4] }}</td>
             </tr>
         {% endfor %} 
 </table>
