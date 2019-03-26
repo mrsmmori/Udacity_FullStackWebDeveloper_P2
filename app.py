@@ -37,9 +37,9 @@ def init_db():
 
     # Input sample data
     sample_items = [
-        ['1', 'The shoes', 'Good condition, Reasonalbe price, good quality', 'test@gmail.com'],
-        ['1', 'The shirt', 'Not good condition, Price is okay', 'test@gmail.com'],
-        ['3', 'The bat', 'condition is so-so, but very expensive', 'test@gmail.com'],
+        ['1', 'The shoes', 'Good condition', 'test@gmail.com'],
+        ['1', 'The shirt', 'Not good condition', 'test@gmail.com'],
+        ['3', 'The bat', 'condition is so-so', 'test@gmail.com'],
         ['5', 'Snowboard', 'Good condition, good quality', 'test@gmail.com'],
         ['5', 'Snowboard', 'Bad condition, good quality', 'test@gmail.com']
     ]
@@ -63,8 +63,8 @@ def initdb_command():
 def base():
     categories = [i for i in db.session.query(Sports.name)]
     items = [i for i in db.session.query(Items.id, Sports.name, Items.title,
-             Items.description, Items.created_by).filter(Sports.id == Items.cat_id)
-             .order_by(Items.id)]
+             Items.description, Items.created_by)
+             .filter(Sports.id == Items.cat_id).order_by(Items.id)]
     items = [(str(i[0]), i[1], i[2], i[3], i[4]) for i in items]
     if not oauth2.has_credentials():
         return render_template('index.html', categories=categories,
@@ -78,7 +78,8 @@ def base():
 def show_items(category):
     categories = [i for i in db.session.query(Sports.name)]
     items = [i for i in db.session.query(Items.id, Sports.name, Items.title,
-             Items.description, Items.created_by).filter(Sports.id == Items.cat_id)
+             Items.description, Items.created_by)
+             .filter(Sports.id == Items.cat_id)
              .filter(Sports.name == category).order_by(Items.id)]
     items = [(str(i[0]), i[1], i[2], i[3], i[4]) for i in items]
     if not oauth2.has_credentials():
@@ -117,18 +118,18 @@ def show_description(category, item):
     else:
         if created_by == oauth2.email:
             return render_template('index_login.html',
-                               categories=categories,
-                               items=items, category=category, item=item,
-                               description=description, 
-                               created_by=oauth2.email,
-                               id=id, user=oauth2.email)
+                                   categories=categories,
+                                   items=items, category=category, item=item,
+                                   description=description,
+                                   created_by=oauth2.email,
+                                   id=id, user=oauth2.email)
         else:
-           return render_template('index_login.html',
-                               categories=categories,
-                               items=items, category=category, item=item,
-                               description=description, 
-                               created_by="",
-                               id=id, user=oauth2.email)
+            return render_template('index_login.html',
+                                   categories=categories,
+                                   items=items, category=category, item=item,
+                                   description=description,
+                                   created_by="",
+                                   id=id, user=oauth2.email)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -148,7 +149,8 @@ def logout():
 @oauth2.required
 def add_item():
     categories = [i for i in db.session.query(Sports.name)]
-    return render_template('add_item.html', categories=categories, user=oauth2.email)
+    return render_template('add_item.html', categories=categories,
+                           user=oauth2.email)
 
 
 @app.route('/add_item_post', methods=['POST'])
